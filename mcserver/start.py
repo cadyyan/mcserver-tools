@@ -62,7 +62,6 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 
         with daemon.DaemonContext(
             gid               = gid,
-            #pidfile           = daemon.pidfile.TimeoutPIDLockFile(pidfile),
             pidfile           = lockfile.pidlockfile.PIDLockFile(pidfile),
             prevent_core      = True,
             uid               = uid,
