@@ -22,7 +22,12 @@ def handler_start_server(args):
 	"""
 
 	mcserver.setup_logging(args.is_verbose)
-	mcserver.start_server(args.server_dir, args.is_verbose)
+	mcserver.start_server(
+		args.server_dir,
+		is_daemon = args.is_daemon,
+		uid       = args.uid,
+		gid       = args.gid,
+	)
 
 def add_command(name, parser, handler):
 	"""
@@ -61,6 +66,14 @@ def get_command_args():
 							  dest = 'is_daemon',
 							  action = 'store_true',
 							  help = 'Start the server as a daemon')
+	start_parser.add_argument('--user',
+							  dest = 'uid',
+							  type = str,
+							  help = 'The effective user to run the server as')
+	start_parser.add_argument('--group',
+							  dest = 'gid',
+							  type = str,
+							  help = 'The effective group to run the server as')
 
 	return parser.parse_args()
 

@@ -7,6 +7,7 @@ import logging
 import os.path
 
 SETTINGS_FILE = 'mcserver.settings'
+PIDFILE       = 'server.pid'
 LOGGER        = None
 
 def setup_logging(verbose):
@@ -92,6 +93,13 @@ def _get_setting_jar(settings):
 
 	return _get_setting(settings, 'jar', default = 'minecraft_server.jar')
 
+def _get_extra_start_args(settings):
+	"""
+	Get the arguments that should be passed to the server at start
+	"""
+
+	return _get_setting(settings, 'extra_start_args', default = '')
+
 def load_server_settings(path):
 	"""
 	Load the server settings from the settings file.
@@ -102,3 +110,10 @@ def load_server_settings(path):
 		settings = json.load(settings_file)
 
 	return settings
+
+def _get_pidfile(path):
+	"""
+	Get PID file for daemon servers
+	"""
+
+	return os.path.join(path, PIDFILE)
