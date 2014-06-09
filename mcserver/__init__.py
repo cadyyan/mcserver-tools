@@ -7,7 +7,8 @@ from start import start_server
 
 __all__ = [
 	'load_server_settings',
-	'MCServerError'
+	'MCServerError',
 	'setup_logging',
 	'start_server',
 ]
+

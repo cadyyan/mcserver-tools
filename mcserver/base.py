@@ -122,3 +122,4 @@ def _get_pidfile(path):
 	"""
 
 	return os.path.join(path, PIDFILE)
+
