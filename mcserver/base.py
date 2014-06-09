@@ -10,6 +10,11 @@ SETTINGS_FILE = 'mcserver.settings'
 PIDFILE       = 'server.pid'
 LOGGER        = None
 
+class MCServerError(Exception):
+	"""
+	Generic Minecraft server error
+	"""
+
 def setup_logging(verbose):
 	"""
 	Setup logger. This MUST be called before using any commands
@@ -41,15 +46,15 @@ def _validate_server_path(path):
 	"""
 
 	if not os.path.exists(path):
-		raise Exception('Path does not exist')
+		raise MCServerError('Path does not exist')
 
 	if not os.path.isdir(path):
-		raise Exception('Path is not a directory')
+		raise MCServerError('Path is not a directory')
 
 	# TODO: this really only checks for our settings file
 	# TODO: might want to check for forge jar or mc jar?
 	if not os.path.exists(_get_settings_path(path)):
-		raise Exception('Path does not point to valid Minecraft server')
+		raise MCServerError('Path does not point to a valid Minecraft server')
 
 def _get_setting(settings, name, default = None):
 	"""
