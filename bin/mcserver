@@ -37,15 +37,15 @@ def add_command(name, parser, handler):
 	command_parser = parser.add_parser(name)
 
 	command_parser.add_argument('--dir', '-d',
-						dest = 'server_dir',
-						type = str,
-						default = '.',
-						help = 'The server directory. Defaults to current directory')
+								dest = 'server_dir',
+								type = str,
+								default = '.',
+								help = 'The server directory. Defaults to current directory')
 
 	command_parser.add_argument('--verbose', '-v',
-						dest = 'is_verbose',
-						action = 'store_true',
-						help = 'Make output more berbose')
+								dest = 'is_verbose',
+								action = 'store_true',
+								help = 'Make output more berbose')
 
 	command_parser.set_defaults(func = handler)
 
@@ -93,4 +93,3 @@ def main():
 
 if __name__ == '__main__':
 	main()
-

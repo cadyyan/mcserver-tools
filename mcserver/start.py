@@ -2,15 +2,13 @@
 Utlities for starting the server
 """
 
-from __future__ import print_function
-
 import daemon
 import lockfile.pidlockfile
 import os
 import os.path
 import subprocess
 
-from mcserver import base
+from mcserver import base, reflection
 
 def start_server(path, is_daemon = False, uid = None, gid = None):
 	"""
@@ -28,17 +26,7 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 	jar        = base._get_setting_jar(settings)
 	extra_args = base._get_extra_start_args(settings)
 
-	command = '{jvm} -Xmx{heap} -Xms{stack} -XX:MaxPermSize={perm_gen} -jar {jar} {args}'.format(
-		jvm      = jvm,
-		heap     = max_heap,
-		stack    = max_stack,
-		perm_gen = perm_gen,
-		jar      = os.path.join(path, jar) if not is_daemon else jar,
-		args     = extra_args,
-	)
-
 	base.LOGGER.info('Starting server...')
-	base.LOGGER.debug('Starting server with `{0}`'.format(command))
 
 	if not is_daemon:
 		if uid != None:
@@ -56,21 +44,23 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 			)
 		)
 
-		pidfile = os.path.abspath(base._get_pidfile(path))
-		if not os.path.exists(pidfile):
-			open(pidfile, 'w').close()
+		launcher_config = base._get_launcher(settings)
+		launcher_class  = reflection.get_class(launcher_config['class'])
 
-		with daemon.DaemonContext(
-			gid               = gid,
-			pidfile           = lockfile.pidlockfile.PIDLockFile(pidfile),
-			prevent_core      = True,
-			uid               = uid,
-			working_directory = path,
-		) as daemon_context:
-			process = subprocess.Popen(command, shell = True)
-			process.communicate()
+		launcher = launcher_class(
+			path,
+			jvm,
+			max_heap,
+			max_stack,
+			perm_gen,
+			jar,
+			extra_args,
+			uid,
+			gid,
+			**launcher_config
+		)
+		launcher.start()
 	else:
-		process = subprocess.Popen(command, shell = True)
+		process = subprocess.Popen(command, shell = True) # TODO: theres no more command here!
 
 		process.wait()
-
