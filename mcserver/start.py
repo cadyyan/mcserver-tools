@@ -62,6 +62,9 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 			gid,
 		)
 	else:
+		command = base._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
+		base.LOGGER.debug('Starting server with command {0}'.format(command))
+
 		process = subprocess.Popen(command, shell = True) # TODO: theres no more command here!
 
 		process.wait()
