@@ -2,10 +2,12 @@
 TMUX terminal interface
 """
 
+from mcserver import base
 from mcserver.base import MCServerError
 from mcserver.launchers import base as launcher_base
 
 import os.path
+import subprocess
 import tmuxp
 
 class TmuxServerLauncher(launcher_base.ServerLauncher):
@@ -13,31 +15,18 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 	TMUX based launcher
 	"""
 
-	def __init__(self, path, jvm, max_heap,
-				 max_stack, perm_gen, jar, extra_args,
-				 uid, gid,
-				 *args, **kwargs):
+	def __init__(self, path, *args, **kwargs):
 		"""
 		Create a new TMUX terminal interface.
 		"""
 
 		super(TmuxServerLauncher, self).__init__(
 			path,
-			jvm,
-			max_heap,
-			max_stack,
-			perm_gen,
-			jar,
-			extra_args,
-			uid,
-			gid,
 			*args,
 			**kwargs
 		)
 
 		self._validate_config(*args, **kwargs)
-
-		self.path = path
 
 		self.session_name = kwargs['session']
 		self.window_name  = kwargs['window']
@@ -47,8 +36,20 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		self.window  = self._get_window()
 		self.pane    = self._get_pane()
 
-	def start(self):
-		self.pane.send_keys(self.command)
+	def start(self, jvm, max_heap,
+			max_stack, perm_gen, jar, extra_args,
+			uid, gid):
+		command = self._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
+
+		base.LOGGER.debug('Server will start with command: {0}'.format(command))
+		self.pane.send_keys(command)
+
+		subprocess.check_output(
+			'echo $! > {0}'.format(
+				base._get_pidfile(self.path),
+			),
+			shell = True,
+		) # TODO: not at all cross platform :-/
 
 	def stop(self):
 		self.pane.send_keys('stop')

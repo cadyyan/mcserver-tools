@@ -29,10 +29,20 @@ def handler_start_server(args):
 		gid       = args.gid,
 	)
 
+def handler_stop_server(args):
+	"""
+	Stop the Minecraft server
+	"""
+
+	mcserver.setup_logging(args.is_verbose)
+	mcserver.stop_server(args.server_dir)
+
 def add_command(name, parser, handler):
 	"""
 	Add command line command
 	"""
+
+	# TODO: there needs to be a way to add a help message
 
 	command_parser = parser.add_parser(name)
 
@@ -75,6 +85,7 @@ def get_command_args():
 							  type = str,
 							  help = 'The effective group to run the server as')
 
+	stop_parser = add_command('stop', subparsers, handler_stop_server)
 
 	return parser.parse_args()
 

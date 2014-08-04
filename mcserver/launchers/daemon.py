@@ -13,6 +13,8 @@ from mcserver.launchers import base as launcher_base
 class DaemonServerLauncher(launcher_base.ServerLauncher):
 	"""
 	Launch the server as a daemon process
+
+	TODO: deprecated for now till interfaces are a thing :-/
 	"""
 
 	def start(self):

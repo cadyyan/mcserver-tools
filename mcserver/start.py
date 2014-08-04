@@ -49,6 +49,9 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 
 		launcher = launcher_class(
 			path,
+			**launcher_config
+		)
+		launcher.start(
 			jvm,
 			max_heap,
 			max_stack,
@@ -57,9 +60,7 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 			extra_args,
 			uid,
 			gid,
-			**launcher_config
 		)
-		launcher.start()
 	else:
 		process = subprocess.Popen(command, shell = True) # TODO: theres no more command here!
 
