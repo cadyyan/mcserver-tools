@@ -42,18 +42,3 @@ class ServerLauncher(object):
 
 		stop()
 		start(jvm, max_heap, max_stack, perm_gen, jar, extra_args, uid, gid)
-
-	def _build_command(self, jvm, max_heap,
-					   max_stack, perm_gen, jar, extra_args):
-		"""
-		Build the command for starting the server
-		"""
-
-		return '{jvm} -Xmx{heap} -Xms{stack} -XX:MaxPermSize={perm_gen} -jar {jar} {args}'.format(
-			jvm      = jvm,
-			heap     = max_heap,
-			stack    = max_stack,
-			perm_gen = perm_gen,
-			jar      = jar,
-			args     = extra_args,
-		)

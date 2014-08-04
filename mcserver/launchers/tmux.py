@@ -39,7 +39,7 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 	def start(self, jvm, max_heap,
 			max_stack, perm_gen, jar, extra_args,
 			uid, gid):
-		command = self._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
+		command = base._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
 
 		base.LOGGER.debug('Server will start with command: {0}'.format(command))
 		self.pane.send_keys(command)
