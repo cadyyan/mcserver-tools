@@ -130,7 +130,7 @@ def _get_pidfile(path):
 
 	return os.path.join(path, PIDFILE)
 
-def _build_command(self, jvm, max_heap,
+def _build_command(jvm, max_heap,
 				max_stack, perm_gen, jar, extra_args):
 	"""
 	Build the command for starting the server
