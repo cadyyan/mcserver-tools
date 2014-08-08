@@ -37,6 +37,19 @@ def handler_stop_server(args):
 	mcserver.setup_logging(args.is_verbose)
 	mcserver.stop_server(args.server_dir)
 
+def handler_restart_server(args):
+	"""
+	Restart the Minecraft server
+	"""
+
+	mcserver.setup_logging(args.is_verbose)
+	mcserver.restart_server(
+		args.server_dir,
+		is_daemon = args.is_daemon,
+		uid       = args.uid,
+		gid       = args.gid,
+	)
+
 def add_command(name, parser, handler):
 	"""
 	Add command line command
@@ -86,6 +99,20 @@ def get_command_args():
 							  help = 'The effective group to run the server as')
 
 	stop_parser = add_command('stop', subparsers, handler_stop_server)
+
+	restart_parser = add_command('restart', subparsers, handler_restart_server)
+	restart_parser.add_argument('--daemon',
+							dest = 'is_daemon',
+							action = 'store_true',
+							help = 'Start the server as a daemon')
+	restart_parser.add_argument('--user',
+							dest = 'uid',
+							type = str,
+							help = 'The effective user to run the server as')
+	restart_parser.add_argument('--group',
+							dest = 'gid',
+							type = str,
+							help = 'The effective group to run the server as')
 
 	return parser.parse_args()
 

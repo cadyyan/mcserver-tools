@@ -54,6 +54,16 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 	def stop(self):
 		self.pane.send_keys('stop')
 
+	def restart(self, jvm, max_heap,
+			max_stack, perm_gen, jar, extra_args,
+			uid, gid):
+		self.stop()
+
+		# Have to do some kind of wait since we can't know when it stopped
+		# TODO: do a stupid wait
+
+		self.start(jvm, max_heap, max_stack, perm_gen, jar, extra_args, uid, gid)
+
 	def _validate_config(*args, **kwargs):
 		"""
 		Validate config settings.
