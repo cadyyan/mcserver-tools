@@ -21,12 +21,16 @@ def handler_start_server(args):
 	Start the Minecraft server
 	"""
 
+	is_daemon = None
+	if args.is_daemon or args.no_daemon:
+		is_daemon = args.is_daemon
+
 	mcserver.setup_logging(args.is_verbose)
 	mcserver.start_server(
 		args.server_dir,
-		is_daemon = args.is_daemon,
-		uid       = args.uid,
-		gid       = args.gid,
+		is_daemon       = is_daemon,
+		uid             = args.uid,
+		gid             = args.gid,
 	)
 
 def handler_stop_server(args):
@@ -85,10 +89,15 @@ def get_command_args():
 	subparsers = parser.add_subparsers(title = 'Command')
 
 	start_parser = add_command('start', subparsers, handler_start_server)
-	start_parser.add_argument('--daemon',
-							  dest = 'is_daemon',
+	daemon_group = start_parser.add_argument_group(title = 'Daemon options')
+	daemon_group.add_argument('--daemon',
+							  dest   = 'is_daemon',
 							  action = 'store_true',
-							  help = 'Start the server as a daemon')
+							  help   = 'Start the server as a daemon')
+	daemon_group.add_argument('--no-daemon',
+							  dest   = 'no_daemon',
+							  action = 'store_true',
+							  help   = 'Start the server not as a daemon')
 	start_parser.add_argument('--user',
 							  dest = 'uid',
 							  type = str,

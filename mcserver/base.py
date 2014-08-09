@@ -105,6 +105,13 @@ def _get_extra_start_args(settings):
 
 	return _get_setting(settings, 'extra_start_args', default = '')
 
+def _get_setting_daemon(settings):
+	"""
+	Get the setting for if the server should be started as a daemon
+	"""
+
+	return _get_setting(settings, 'daemon', default = False)
+
 def _get_launcher(settings):
 	"""
 	Get the server launcher

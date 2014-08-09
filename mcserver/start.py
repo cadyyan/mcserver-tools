@@ -10,7 +10,7 @@ import subprocess
 
 from mcserver import base, reflection
 
-def start_server(path, is_daemon = False, uid = None, gid = None):
+def start_server(path, is_daemon = None, uid = None, gid = None):
 	"""
 	Start the server. Optionally start it as a daemon.
 	"""
@@ -27,6 +27,9 @@ def start_server(path, is_daemon = False, uid = None, gid = None):
 	extra_args = base._get_extra_start_args(settings)
 
 	base.LOGGER.info('Starting server...')
+
+	if is_daemon == None:
+		is_daemon = base._get_setting_daemon(settings)
 
 	if not is_daemon:
 		if uid != None:
