@@ -23,6 +23,9 @@ class RConClient(object):
 		Set up client but do not connect
 		"""
 
+		if not server_settings['enable-rcon']:
+			raise Exception('RCon not enabled on server')
+
 		self.host   = '127.0.0.1'
 		self.port   = server_settings.get('rcon.port') or 25575
 		self.socket = self._create_socket()
