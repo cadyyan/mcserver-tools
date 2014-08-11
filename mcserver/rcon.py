@@ -96,6 +96,14 @@ class RConClient(object):
 
 		return self._send_raw(self.COMMAND_TYPE, command)
 
+	def wait_for_close(self):
+		"""
+		Wait for the socket to get closed
+		"""
+
+		self.socket.settimeout(30)
+		self.socket.recv(12)
+
 	def _create_socket(self):
 		"""
 		Create a new socket
