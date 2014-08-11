@@ -85,6 +85,8 @@ class RConClient(object):
 			response += resp_data
 			ready     = select.select([self.socket], [], [], 0)[0]
 
+		response.replace(self.TERMINATOR, '')
+
 		return response
 
 	def send_command(self, command):
