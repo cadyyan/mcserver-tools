@@ -3,7 +3,6 @@ A good old fashioned Unix style daemon process
 """
 
 import daemon
-import lockfile.pidlockfile
 import os.path
 import subprocess
 
