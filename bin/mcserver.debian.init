@@ -1,0 +1,46 @@
+#!/bin/bash
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+SERVERS_DIR=TODO # The path to where you keep your server directories goes here
+UID=TODO         # The UID of the user to run this as
+GID=TODO         # The GID of the user to run this as
+
+SERVERS=`ls $SERVERS_DIR`
+
+if [ "$#" -ge 3 ]
+then
+	SERVERS=("$2")
+fi
+
+for server in $SERVERS
+do
+	if [ ! -e "$server/mcserver.settings" ]
+	then
+		continue
+	fi
+
+	case "$1" in
+		start)
+			mcserver start --daemon --dir "$server" --uid "$UID" --gid "$GID"
+
+			exit $?
+			;;
+		stop)
+			mcserver stop --daemon --dir "$server"
+
+			exit $?
+			;;
+		restart)
+			mcserver restart --daemon --dir "$server" --uid "$UID" --gid "$GID"
+
+			exit $?
+			;;
+		*)
+			echo "Usage: $0 {start|stop|restart} <server>"
+			exit 1
+			;;
+	esac
+done
+
+exit 0
