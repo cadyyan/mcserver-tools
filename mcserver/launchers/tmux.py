@@ -44,13 +44,6 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		base.LOGGER.debug('Server will start with command: {0}'.format(command))
 		self.pane.send_keys(command)
 
-		subprocess.check_output(
-			'echo $! > {0}'.format(
-				base._get_pidfile(self.path),
-			),
-			shell = True,
-		) # TODO: not at all cross platform :-/
-
 	def _validate_config(*args, **kwargs):
 		"""
 		Validate config settings.

@@ -3,7 +3,7 @@ Different server launchers
 """
 
 from mcserver.launchers.base import ServerLauncher
-from mcserver.launchers.daemon import DaemonServerLauncher
+from mcserver.launchers.unixdaemon import DaemonServerLauncher
 from mcserver.launchers.tmux import TmuxServerLauncher
 
 __all__ = [
