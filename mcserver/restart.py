@@ -4,7 +4,7 @@ Handle restarts
 
 from mcserver import start, stop
 
-def restart_server(path, is_daemon = False, uid = None, gid = None):
+def restart_server(path, is_daemon = None, uid = None, gid = None):
 	"""
 	Handle server restarts
 	"""

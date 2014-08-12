@@ -46,10 +46,14 @@ def handler_restart_server(args):
 	Restart the Minecraft server
 	"""
 
+	is_daemon = None
+	if args.is_daemon or args.no_daemon:
+		is_daemon = args.is_daemon
+
 	mcserver.setup_logging(args.is_verbose)
 	mcserver.restart_server(
 		args.server_dir,
-		is_daemon = args.is_daemon,
+		is_daemon = is_daemon,
 		uid       = args.uid,
 		gid       = args.gid,
 	)
@@ -110,10 +114,15 @@ def get_command_args():
 	stop_parser = add_command('stop', subparsers, handler_stop_server)
 
 	restart_parser = add_command('restart', subparsers, handler_restart_server)
-	restart_parser.add_argument('--daemon',
+	daemon_group = restart_parser.add_argument_group(title = 'Daemon options')
+	daemon_group.add_argument('--daemon',
 							dest = 'is_daemon',
 							action = 'store_true',
 							help = 'Start the server as a daemon')
+	daemon_group.add_argument('--no-daemon',
+							dest   = 'no_daemon',
+							action = 'store_true',
+							help   = 'Start the server not as a daemon')
 	restart_parser.add_argument('--user',
 							dest = 'uid',
 							type = str,

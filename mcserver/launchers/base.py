@@ -6,7 +6,7 @@ import abc
 import os.path
 import re
 
-from mcserver import base
+from mcserver import base, rcon
 
 class ServerLauncher(object):
 	"""
@@ -24,9 +24,8 @@ class ServerLauncher(object):
 		"""
 
 		self.path              = path
-		self.server_properties = {}
-
-		self._load_server_properties()
+		self.server_properties = self._load_server_properties()
+		self.rcon              = rcon.RConClient(self.server_properties)
 
 	@abc.abstractmethod
 	def start(self, jvm, max_heap,
@@ -36,11 +35,15 @@ class ServerLauncher(object):
 		Start the server
 		"""
 
-	@abc.abstractmethod
 	def stop(self):
 		"""
 		Stop the server
 		"""
+
+		self.rcon.connect(self.server_properties)
+		self.rcon.send_command('stop')
+		self.rcon.wait_for_close()
+		self.rcon.disconnect()
 
 	def restart(self, jvm, max_heap,
 				max_stack, perm_gen, jar, extra_args,
@@ -49,8 +52,9 @@ class ServerLauncher(object):
 		Restart the server
 		"""
 
-		stop()
-		start(jvm, max_heap, max_stack, perm_gen, jar, extra_args, uid, gid)
+		self.rcon.connect(self.server_properties)
+		self.stop()
+		self.start(jvm, max_heap, max_stack, perm_gen, jar, extra_args, uid, gid)
 
 	def _load_server_properties(self):
 		"""
@@ -59,7 +63,7 @@ class ServerLauncher(object):
 		generate a default one eventually ;)
 		"""
 
-		self.server_properties = {}
+		server_properties = {}
 
 		base.LOGGER.info('Loading server properties...')
 
@@ -82,4 +86,6 @@ class ServerLauncher(object):
 				(prop, value) = m.groups()
 				base.LOGGER.debug('Found property/value: {0}:{1}'.format(prop, value))
 
-				self.server_properties[prop] = value
+				server_properties[prop] = value
+
+		return server_properties
