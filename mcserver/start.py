@@ -2,8 +2,6 @@
 Utlities for starting the server
 """
 
-import daemon
-import lockfile.pidlockfile
 import os
 import os.path
 import subprocess
