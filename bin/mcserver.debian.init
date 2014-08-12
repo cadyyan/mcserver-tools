@@ -2,9 +2,9 @@
 
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 
-SERVERS_DIR=TODO # The path to where you keep your server directories goes here
-UID=TODO         # The UID of the user to run this as
-GID=TODO         # The GID of the user to run this as
+SERVERS_DIR=TODO      # The path to where you keep your server directories goes here
+USER_ID=TODO          # The UID of the user to run this as
+GROUP_ID=TODO         # The GID of the user to run this as
 
 SERVERS=`ls $SERVERS_DIR`
 
@@ -15,6 +15,8 @@ fi
 
 for server in $SERVERS
 do
+	server=$SERVERS_DIR/$server
+
 	if [ ! -e "$server/mcserver.settings" ]
 	then
 		continue
@@ -22,7 +24,7 @@ do
 
 	case "$1" in
 		start)
-			mcserver start --daemon --dir "$server" --uid "$UID" --gid "$GID"
+			mcserver start --daemon --dir "$server" --user "$USER_ID" --group "$GROUP_ID"
 
 			exit $?
 			;;
@@ -32,7 +34,7 @@ do
 			exit $?
 			;;
 		restart)
-			mcserver restart --daemon --dir "$server" --uid "$UID" --gid "$GID"
+			mcserver restart --daemon --dir "$server" --user "$USER_ID" --group "$GROUP_ID"
 
 			exit $?
 			;;
