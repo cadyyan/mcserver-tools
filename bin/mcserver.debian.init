@@ -6,6 +6,8 @@ SERVERS_DIR=TODO      # The path to where you keep your server directories goes 
 USER_ID=TODO          # The UID of the user to run this as
 GROUP_ID=TODO         # The GID of the user to run this as
 
+DAEMON=<path to mcserver>
+
 SERVERS=`ls $SERVERS_DIR`
 
 if [ "$#" -ge 3 ]
@@ -24,17 +26,17 @@ do
 
 	case "$1" in
 		start)
-			mcserver start --daemon --dir "$server" --user "$USER_ID" --group "$GROUP_ID"
+			start-stop-daemon --start --chuid $USER_ID:$GROUP_ID --exec "$DAEMON" -- start --daemon --dir $server --user $USER_ID --group $GROUP_ID
 
 			exit $?
 			;;
 		stop)
-			mcserver stop --daemon --dir "$server"
+			start-stop-daemon --start --chuid $USER_ID:$GROUP_ID --exec "$DAEMON" -- stop --dir $server
 
 			exit $?
 			;;
 		restart)
-			mcserver restart --daemon --dir "$server" --user "$USER_ID" --group "$GROUP_ID"
+			start-stop-daemon --start --chuid $USER_ID:$GROUP_ID --exec $DAEMON -- restart --daemon --dir $server --user $USER_ID --group $GROUP_ID
 
 			exit $?
 			;;
