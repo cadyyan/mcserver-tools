@@ -76,7 +76,7 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		return self._server
 
 	@property
-	def session*self):
+	def session(self):
 		"""
 		tmux session
 		"""
