@@ -6,6 +6,7 @@ from mcserver import base
 from mcserver.base import MCServerError
 from mcserver.launchers import base as launcher_base
 
+import os
 import os.path
 import subprocess
 import tmuxp
@@ -31,14 +32,21 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		self.session_name = kwargs['session']
 		self.window_name  = kwargs['window']
 
-		self.server  = tmuxp.Server()
-		self.session = self._get_session()
-		self.window  = self._get_window()
-		self.pane    = self._get_pane()
+		self._server  = None
+		self._session = None
+		self._window  = None
+		self._pane    = None
 
 	def start(self, jvm, max_heap,
 			max_stack, perm_gen, jar, extra_args,
 			uid, gid):
+
+		if uid:
+			os.setuid(uid)
+
+		if gid:
+			os.setgid(gid)
+
 		command = base._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
 
 		base.LOGGER.debug('Server will start with command: {0}'.format(command))
@@ -54,6 +62,54 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 
 		if 'window' not in kwargs:
 			raise MCServerError('No window name given for TMUX interface')
+
+	@property
+	def server(self):
+		"""
+		tmux server
+		"""
+
+		if self._server:
+			return self._server
+
+		self._server = tmuxp.Server()
+		return self._server
+
+	@property
+	def session*self):
+		"""
+		tmux session
+		"""
+
+		if self._session:
+			return self._session
+
+		self._session = self._get_session()
+		return self._session
+
+	@property
+	def window(self):
+		"""
+		tmux window
+		"""
+
+		if self._window:
+			return self._window
+
+		self._window = self._get_window()
+		return self._window
+
+	@property
+	def pane(self):
+		"""
+		tmux pane
+		"""
+
+		if self._pane:
+			return self._pane
+
+		self._pane = self._get_pane()
+		return self._pane
 
 	def _get_session(self):
 		"""
