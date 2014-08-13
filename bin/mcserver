@@ -104,11 +104,11 @@ def get_command_args():
 							  help   = 'Start the server not as a daemon')
 	start_parser.add_argument('--user',
 							  dest = 'uid',
-							  type = str,
+							  type = int,
 							  help = 'The effective user to run the server as')
 	start_parser.add_argument('--group',
 							  dest = 'gid',
-							  type = str,
+							  type = int,
 							  help = 'The effective group to run the server as')
 
 	stop_parser = add_command('stop', subparsers, handler_stop_server)
