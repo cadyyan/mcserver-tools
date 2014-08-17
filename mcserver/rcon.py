@@ -25,11 +25,11 @@ class RConClient(object):
 		Set up client but do not connect
 		"""
 
-		if not server_settings['enable-rcon']:
+		if not server_settings.get_boolean('enable-rcon'):
 			raise Exception('RCon not enabled on server')
 
 		self.host   = '127.0.0.1'
-		self.port   = server_settings.get('rcon.port') or 25575
+		self.port   = server_settings.get_int('rcon.port', 25575)
 		self.socket = self._create_socket()
 
 	def connect(self, server_settings):
@@ -39,11 +39,12 @@ class RConClient(object):
 
 		base.LOGGER.debug('Connecting to RCon on port {}'.format(self.port))
 
-		if 'rcon.password' not in server_settings:
+		rcon_password = server_settings.get('rcon.password')
+		if not rcon_password:
 			raise IOError('No RCon password specified')
 
 		self.socket.connect((self.host, int(self.port)))
-		self._send_raw(self.LOGIN_TYPE, server_settings.get('rcon.password'))
+		self._send_raw(self.LOGIN_TYPE, rcon_password)
 
 	def disconnect(self):
 		"""
