@@ -55,6 +55,14 @@ class MinecraftServerConfig(object):
 
 		return self._settings[property]
 
+	def get_boolean(self, property, default = None):
+		ret = self.get(property, default)
+
+		if ret:
+			ret = bool(ret)
+
+		return ret
+
 	def get_int(self, property, default = None):
 		"""
 		Try to get the property value as an integer. If the property was
