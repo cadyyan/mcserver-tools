@@ -49,10 +49,9 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 
 		command = base._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
 
-		base.LOGGER.debug('Server will start with command: {0}'.format(command))
 		self.pane.send_keys(command)
 
-	def _validate_config(*args, **kwargs):
+	def _validate_config(self, *args, **kwargs):
 		"""
 		Validate config settings.
 		"""

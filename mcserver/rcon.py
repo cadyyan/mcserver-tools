@@ -7,8 +7,6 @@ import select
 import socket
 import struct
 
-from mcserver import base
-
 class RConClient(object):
 	"""
 	Remote console client for Minecraft (only connects to localhost)
@@ -36,8 +34,6 @@ class RConClient(object):
 		"""
 		Connect to the RCon server
 		"""
-
-		base.LOGGER.debug('Connecting to RCon on port {}'.format(self.port))
 
 		rcon_password = server_settings.get('rcon.password')
 		if not rcon_password:

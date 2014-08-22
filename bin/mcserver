@@ -25,12 +25,11 @@ def handler_start_server(args):
 	if args.is_daemon or args.no_daemon:
 		is_daemon = args.is_daemon
 
-	mcserver.setup_logging(args.is_verbose)
-	mcserver.start_server(
-		args.server_dir,
-		is_daemon       = is_daemon,
-		uid             = args.uid,
-		gid             = args.gid,
+	server = mcserver.Server(args.server_dir)
+	server.start(
+		is_daemon = is_daemon,
+		uid       = args.uid,
+		gid       = args.gid,
 	)
 
 def handler_stop_server(args):
@@ -38,8 +37,8 @@ def handler_stop_server(args):
 	Stop the Minecraft server
 	"""
 
-	mcserver.setup_logging(args.is_verbose)
-	mcserver.stop_server(args.server_dir)
+	server = mcserver.Server(args.server_dir)
+	server.stop()
 
 def handler_restart_server(args):
 	"""
@@ -50,9 +49,8 @@ def handler_restart_server(args):
 	if args.is_daemon or args.no_daemon:
 		is_daemon = args.is_daemon
 
-	mcserver.setup_logging(args.is_verbose)
-	mcserver.restart_server(
-		args.server_dir,
+	server = mcserver.Server(args.server_dir)
+	server.start(
 		is_daemon = is_daemon,
 		uid       = args.uid,
 		gid       = args.gid,
