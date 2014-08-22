@@ -41,3 +41,10 @@ class CoreConfig(object):
 
 		return self._settings[property]
 
+	def has(self, property):
+		"""
+		Check if the config has the given property.
+		"""
+
+		return property in self._settings
+
