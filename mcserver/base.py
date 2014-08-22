@@ -2,7 +2,6 @@
 Base utility classes and methods
 """
 
-import json
 import logging
 import os.path
 
@@ -42,8 +41,7 @@ def _validate_server_path(path):
 	if not os.path.isdir(path):
 		raise MCServerError('Path is not a directory')
 
-def _build_command(jvm, max_heap,
-				max_stack, perm_gen, jar, extra_args):
+def _build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args):
 	"""
 	Build the command for starting the server
 	"""
