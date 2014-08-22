@@ -11,3 +11,4 @@ def restart_server(path, is_daemon = None, uid = None, gid = None):
 
 	stop.stop_server(path)
 	start.start_server(path, is_daemon = is_daemon, uid = uid, gid = gid)
+

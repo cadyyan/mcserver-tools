@@ -6,7 +6,7 @@ import os
 import os.path
 import subprocess
 
-from mcserver import base, reflection
+from mcserver import base, config, reflection
 
 def start_server(path, is_daemon = None, uid = None, gid = None):
 	"""
@@ -15,19 +15,19 @@ def start_server(path, is_daemon = None, uid = None, gid = None):
 
 	base._validate_server_path(path)
 
-	settings = base.load_server_settings(path)
+	settings = config.CoreConfig(path)
 
-	jvm        = base._get_setting_jvm(settings)
-	max_heap   = base._get_setting_max_heap(settings)
-	max_stack  = base._get_setting_max_stack(settings)
-	perm_gen   = base._get_setting_perm_gen(settings)
-	jar        = base._get_setting_jar(settings)
-	extra_args = base._get_extra_start_args(settings)
+	jvm        = settings.get('java',             default = 'java')
+	max_heap   = settings.get('heap',             default = '1G')
+	max_stack  = settings.get('stack',            default = '1G')
+	perm_gen   = settings.get('perm_gen',         default = '32m')
+	jar        = settings.get('jar',              default = 'minecraft_server.jar')
+	extra_args = settings.get('extra_start_args', default = '')
 
 	base.LOGGER.info('Starting server...')
 
 	if is_daemon == None:
-		is_daemon = base._get_setting_daemon(settings)
+		is_daemon = settings.get('daemon', default = False)
 
 	if not is_daemon:
 		if uid != None:
@@ -45,8 +45,11 @@ def start_server(path, is_daemon = None, uid = None, gid = None):
 			)
 		)
 
-		launcher_config = base._get_launcher(settings)
-		launcher_class  = reflection.get_class(launcher_config['class'])
+		launcher_config = settings.get('launcher')
+		if not launcher_config:
+			raise base.MCServerError('No server launcher configured')
+
+		launcher_class = reflection.get_class(launcher_config['class'])
 
 		launcher = launcher_class(
 			path,
@@ -74,3 +77,4 @@ def start_server(path, is_daemon = None, uid = None, gid = None):
 		process.wait()
 
 		os.chdir(cwd)
+

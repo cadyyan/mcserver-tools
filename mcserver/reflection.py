@@ -17,3 +17,4 @@ def get_class(klass):
 		m = getattr(m, comp)
 
 	return m
+

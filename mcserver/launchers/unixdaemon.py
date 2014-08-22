@@ -34,3 +34,4 @@ class DaemonServerLauncher(launcher_base.ServerLauncher):
 			)
 
 			process.communicate()
+

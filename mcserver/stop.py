@@ -2,7 +2,7 @@
 Handling for stopping the server.
 """
 
-from mcserver import base, reflection
+from mcserver import base, config, reflection
 
 def stop_server(path):
 	"""
@@ -11,16 +11,20 @@ def stop_server(path):
 
 	base._validate_server_path(path)
 
-	settings = base.load_server_settings(path)
+	settings = config.CoreConfig(path)
 
 	base.LOGGER.info('Stopping the server...')
 
-	launcher_config = base._get_launcher(settings)
-	launcher_class  = reflection.get_class(launcher_config['class'])
-	launcher        = launcher_class(
+	launcher_config = settings.get('launcher')
+	if not launcher_config:
+		raise base.MCServerError('No launcher configured')
+
+	launcher_class = reflection.get_class(launcher_config['class'])
+	launcher       = launcher_class(
 		path,
 		**launcher_config
 	)
 
 	base.LOGGER.info('Stopping the server')
 	launcher.stop()
+
