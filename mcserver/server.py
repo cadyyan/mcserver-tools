@@ -27,6 +27,15 @@ class Server(object):
 		self.tool_config   = config.CoreConfig(path)
 		self.server_config = config.MinecraftServerConfig(path)
 
+		self._validate_launcher_config()
+
+		self.launcher_config = self.tool_config.get('launcher', default = None)
+		self.launcher_class  = reflection.get_class(self.launcher_config.get('class'))
+		self.launcher        = self.launcher_class(
+			path,
+			**self.launcher_config
+		)
+
 	def start(self, is_daemon = None, uid = None, gid = None):
 		"""
 		Start the server. Optionally takes a flag for starting as a daemon
@@ -44,18 +53,7 @@ class Server(object):
 			is_daemon = self.tool_config.get('daemon', default = False)
 
 		if is_daemon:
-			launcher_config = self.tool_config.get('launcher')
-			if not launcher_config:
-				raise base.MCServerError('No server launcher configured')
-
-			launcher_class = reflection.get_class(launcher_config['class'])
-
-			launcher = launcher_class(
-				self.path,
-				**launcher_config
-			)
-
-			launcher.start(
+			self.launcher.start(
 				jvm,
 				max_heap,
 				max_stack,
@@ -81,17 +79,7 @@ class Server(object):
 		Stop the server.
 		"""
 
-		launcher_config = self.tool_config.get('launcher')
-		if not launcher_config:
-			raise base.MCServerError('No server launcher configured')
-
-		launcher_class = reflection.get_class(launcher_config['class'])
-		launcher       = launcher_class(
-			self.path,
-			**launcher_config
-		)
-
-		launcher.stop()
+		self.launcher.stop()
 
 	def restart(self, is_daemon = None, uid = None, gid = None):
 		"""
@@ -100,4 +88,15 @@ class Server(object):
 
 		self.stop()
 		self.start(is_daemon, uid, gid)
+
+	def _validate_launcher_config(self):
+		"""
+		Try and do some basic validation on the launcher config
+		"""
+
+		if not self.tool_config.has('launcher'):
+			raise base.MCServerError('No server launcher configured')
+
+		if 'class' not in self.tool_config.get('launcher'):
+			raise base.MCServerError('No launcher class configured')
 
