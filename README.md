@@ -37,6 +37,22 @@ If you're going to be developing your own launcher you should extend the `mcserv
 #### Notes
 You can configure a certain mode to always happen by default. If you always want to run the server as a `daemon` you can set the daemon attribute in the settings file to true and by default the server will be launched in daemon mode. You can force it to do the opposite of the setting value by giving the `--daemon` or `--no-daemon` options on the commandline.
 
+## Admin Interfaces
+Admin interfaces are a way to notify server admins about changes in the server. For instance if the server is started you may want to email the server admins that the server was started. Same would apply with stopping or restarting. Configuration of an interface is very similar to configuration of a launcher. A sample config could look like this:
+
+	admin_interfaces: [
+		{
+			"class": "some.class",
+			"key1": "value1",
+			"key2": "value2",
+		},
+		{
+			"class": "some.other.class",
+		}
+	]
+
+You can have as many interfaces as you want and you can have a single class showing up more than once. All configurations are passed to the interface when it is constructed. When developing an interface make sure to not block.
+
 ## Settings File
 You can store settings for running the server in the `mcserver.settings` file. One use for this file is storing the options that are used to start the server. The file is formatted as a JSON file. A sample can be found below:
 
@@ -51,7 +67,9 @@ You can store settings for running the server in the `mcserver.settings` file. O
 			"class": "mcserver.launchers.TmuxServerLauncher",
 			"session_name": "minecraft",
 			"window_name": "My Minecraft Server"
-		}
+		},
+		"admin_interfaces": [
+		]
 	}
 
 Everything in mcserver.settings is optional and if it is not specified a default value is given. The only exception to this rule is the launcher section. Different launchers are allowed to require different values.
