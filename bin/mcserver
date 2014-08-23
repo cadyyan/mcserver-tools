@@ -56,6 +56,14 @@ def handler_restart_server(args):
 		gid       = args.gid,
 	)
 
+def handler_backup_server(args):
+	"""
+	Backup the server.
+	"""
+
+	server = mcserver.Server(args.server_dir)
+	server.backup()
+
 def add_command(name, parser, handler):
 	"""
 	Add command line command
@@ -129,6 +137,8 @@ def get_command_args():
 							dest = 'gid',
 							type = str,
 							help = 'The effective group to run the server as')
+
+	backup_parser = add_command('backup', subparsers, handler_backup_server)
 
 	return parser.parse_args()
 

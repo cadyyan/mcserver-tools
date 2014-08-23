@@ -14,31 +14,31 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 	TMUX based launcher
 	"""
 
-	def __init__(self, path, *args, **kwargs):
+	def __init__(self, server, *args, **kwargs):
 		"""
 		Create a new TMUX terminal interface.
 		"""
 
-		super(TmuxServerLauncher, self).__init__(path)
+		super(TmuxServerLauncher, self).__init__(server)
 
 		self._validate_config(*args, **kwargs)
 
 		self.session_name = kwargs['session']
 		self.window_name  = kwargs['window']
 
-		self._server  = None
-		self._session = None
-		self._window  = None
-		self._pane    = None
+		self._tmux_server = None
+		self._session     = None
+		self._window      = None
+		self._pane        = None
 
-	def start(self, server, uid, gid):
+	def start(self, uid, gid):
 		if uid:
 			os.setuid(uid)
 
 		if gid:
 			os.setgid(gid)
 
-		self.pane.send_keys(server.start_command)
+		self.pane.send_keys(self.server.start_command)
 
 	def _validate_config(self, *args, **kwargs):
 		"""
@@ -52,16 +52,15 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 			raise MCServerError('No window name given for TMUX interface')
 
 	@property
-	def server(self):
+	def tmux_server(self):
 		"""
 		tmux server
 		"""
 
-		if self._server:
-			return self._server
+		if not self._tmux_server:
+			self._tmux_server = tmuxp.Server()
 
-		self._server = tmuxp.Server()
-		return self._server
+		return self._tmux_server
 
 	@property
 	def session(self):
@@ -69,10 +68,9 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		tmux session
 		"""
 
-		if self._session:
-			return self._session
+		if not self._session:
+			self._session = self._get_session()
 
-		self._session = self._get_session()
 		return self._session
 
 	@property
@@ -81,10 +79,9 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		tmux window
 		"""
 
-		if self._window:
-			return self._window
+		if not self._window:
+			self._window = self._get_window()
 
-		self._window = self._get_window()
 		return self._window
 
 	@property
@@ -93,10 +90,9 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		tmux pane
 		"""
 
-		if self._pane:
-			return self._pane
+		if not self._pane:
+			self._pane = self._get_pane()
 
-		self._pane = self._get_pane()
 		return self._pane
 
 	def _get_session(self):
@@ -104,10 +100,10 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		Get or create the session.
 		"""
 
-		if self.server.has_session(self.session_name):
-			return self.server.findWhere({'session_name': self.session_name})
+		if self.tmux_server.has_session(self.session_name):
+			return self.tmux_server.findWhere({'session_name': self.session_name})
 
-		return self.server.new_session(session_name    = self.session_name)
+		return self.tmux_server.new_session(session_name    = self.session_name)
 
 	def _get_window(self):
 		"""
@@ -119,7 +115,7 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 			return window
 
 		return self.session.new_window(
-			start_directory = os.path.abspath(self.path),
+			start_directory = os.path.abspath(self.server.path),
 			window_name     = self.window_name,
 		)
 

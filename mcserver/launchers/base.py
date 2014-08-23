@@ -2,9 +2,9 @@
 Server launcher base class
 """
 
-import abc
+# pylint: disable=abstract-class-not-used
 
-from mcserver import config, rcon
+import abc
 
 class ServerLauncher(object):
 	"""
@@ -14,17 +14,15 @@ class ServerLauncher(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	def __init__(self, path):
+	def __init__(self, server):
 		"""
 		Instantiate a server launcher with the given config options.
 		"""
 
-		self.path              = path
-		self.server_properties = config.MinecraftServerConfig(path)
-		self.rcon              = rcon.RConClient(self.server_properties)
+		self.server = server
 
 	@abc.abstractmethod
-	def start(self, server, uid, gid):
+	def start(self, uid, gid):
 		"""
 		Start the server
 		"""
@@ -34,17 +32,15 @@ class ServerLauncher(object):
 		Stop the server
 		"""
 
-		self.rcon.connect(self.server_properties)
-		self.rcon.send_command('stop')
-		self.rcon.wait_for_close()
-		self.rcon.disconnect()
+		self.server.rcon.send_command('stop')
+		self.server.rcon.wait_for_close()
+		self.server.rcon.disconnect()
 
-	def restart(self, server, uid, gid):
+	def restart(self, uid, gid):
 		"""
 		Restart the server
 		"""
 
-		self.rcon.connect(self.server_properties)
 		self.stop()
-		self.start(server, uid, gid)
+		self.start(uid, gid)
 

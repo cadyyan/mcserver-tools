@@ -2,11 +2,14 @@
 Represents a server instance
 """
 
+import datetime
 import os
 import os.path
+import socket
 import subprocess
+import tarfile
 
-from mcserver       import base, config, reflection
+from mcserver import base, config, reflection, rcon
 
 class Server(object):
 	"""
@@ -32,11 +35,13 @@ class Server(object):
 		self.launcher_config = self.tool_config.get('launcher', default = None)
 		self.launcher_class  = reflection.get_class(self.launcher_config.get('class'))
 		self.launcher        = self.launcher_class(
-			path,
+			self,
 			**self.launcher_config
 		)
 
 		self.admin_interface_configs = self.tool_config.get('admin_notifications', [])
+
+		self._rcon = None
 
 	def start(self, is_daemon = None, uid = None, gid = None):
 		"""
@@ -49,7 +54,6 @@ class Server(object):
 
 		if is_daemon:
 			self.launcher.start(
-				self,
 				uid,
 				gid,
 			)
@@ -86,6 +90,35 @@ class Server(object):
 
 		for interface in self.admin_interfaces:
 			interface.server_restart(self)
+
+	def backup(self):
+		"""
+		Create a backup of the server.
+		"""
+
+		# The server might be running. If so then we need to prevent it
+		# from saving to disk before we create an archive.
+		try:
+			self.rcon.send_command('say BACKUP STARTING - GOING READONLY')
+			self.rcon.send_command('saveoff')
+
+			is_running = True
+		except socket.error: # We're assuming the problem was with no socket open
+			is_running = False
+
+		# TODO: maybe want to look into max number of backups to keep around or max age
+		backup_dir  = self.backup_dir
+		backup_name = '{}-{}.tar.gz'.format(
+			datetime.datetime.now().isoformat(),
+			self.world_name,
+		)
+
+		with tarfile.open(os.path.join(backup_dir, backup_name), 'w:gz') as tar:
+			tar.add(self.world_name)
+
+		if is_running:
+			self.rcon.send_command('saveon')
+			self.rcon.send_command('say BACKUP COMPLETE')
 
 	@property
 	def jvm(self):
@@ -160,6 +193,41 @@ class Server(object):
 			self._construct_admin_interface(interface)
 			for interface in self.admin_interface_configs
 		]
+
+	@property
+	def rcon(self):
+		"""
+		Get an RCon instance. This may fail if RCon is not setup on the
+		server OR the server isn't running.
+		"""
+
+		if not self._rcon:
+			self._rcon = rcon.RConClient(self.server_config)
+			self._rcon.connect(self.server_config)
+
+		return self._rcon
+
+	@property
+	def backup_dir(self):
+		"""
+		Get the directory that backups should be stored in. This will
+		be created if it does not exist.
+		"""
+
+		directory = self.tool_config.get('backup_dir', default = 'backups')
+
+		if not os.path.exists(directory):
+			os.makedirs(directory)
+
+		return directory
+
+	@property
+	def world_name(self):
+		"""
+		Get the world name.
+		"""
+
+		return self.server_config.get('level-name')
 
 	def _construct_admin_interface(self, interface_config):
 		"""
