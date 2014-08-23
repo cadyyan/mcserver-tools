@@ -3,10 +3,8 @@ Server launcher base class
 """
 
 import abc
-import os.path
-import re
 
-from mcserver import base, config, rcon
+from mcserver import config, rcon
 
 class ServerLauncher(object):
 	"""
@@ -16,7 +14,7 @@ class ServerLauncher(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	def __init__(self, path, *args, **kwargs):
+	def __init__(self, path):
 		"""
 		Instantiate a server launcher with the given config options.
 		"""
@@ -26,9 +24,7 @@ class ServerLauncher(object):
 		self.rcon              = rcon.RConClient(self.server_properties)
 
 	@abc.abstractmethod
-	def start(self, jvm, max_heap,
-			  max_stack, perm_gen, jar, extra_args,
-			  uid, gid):
+	def start(self, server, uid, gid):
 		"""
 		Start the server
 		"""
@@ -43,14 +39,12 @@ class ServerLauncher(object):
 		self.rcon.wait_for_close()
 		self.rcon.disconnect()
 
-	def restart(self, jvm, max_heap,
-				max_stack, perm_gen, jar, extra_args,
-				uid, gid):
+	def restart(self, server, uid, gid):
 		"""
 		Restart the server
 		"""
 
 		self.rcon.connect(self.server_properties)
 		self.stop()
-		self.start(jvm, max_heap, max_stack, perm_gen, jar, extra_args, uid, gid)
+		self.start(server, uid, gid)
 

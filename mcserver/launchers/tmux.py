@@ -2,13 +2,11 @@
 TMUX terminal interface
 """
 
-from mcserver import base
-from mcserver.base import MCServerError
+from mcserver.base      import MCServerError
 from mcserver.launchers import base as launcher_base
 
 import os
 import os.path
-import subprocess
 import tmuxp
 
 class TmuxServerLauncher(launcher_base.ServerLauncher):
@@ -21,11 +19,7 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		Create a new TMUX terminal interface.
 		"""
 
-		super(TmuxServerLauncher, self).__init__(
-			path,
-			*args,
-			**kwargs
-		)
+		super(TmuxServerLauncher, self).__init__(path)
 
 		self._validate_config(*args, **kwargs)
 
@@ -37,19 +31,14 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 		self._window  = None
 		self._pane    = None
 
-	def start(self, jvm, max_heap,
-			max_stack, perm_gen, jar, extra_args,
-			uid, gid):
-
+	def start(self, server, uid, gid):
 		if uid:
 			os.setuid(uid)
 
 		if gid:
 			os.setgid(gid)
 
-		command = base._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
-
-		self.pane.send_keys(command)
+		self.pane.send_keys(server.start_command)
 
 	def _validate_config(self, *args, **kwargs):
 		"""
@@ -141,3 +130,4 @@ class TmuxServerLauncher(launcher_base.ServerLauncher):
 
 		# We always assume that the first pane is the correct one *gulp*
 		return self.window.select_pane(0)
+

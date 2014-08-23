@@ -6,7 +6,7 @@ import os
 import os.path
 import subprocess
 
-from mcserver import base, config, reflection
+from mcserver       import base, config, reflection
 
 class Server(object):
 	"""
@@ -36,30 +36,20 @@ class Server(object):
 			**self.launcher_config
 		)
 
+		self.admin_interface_configs = self.tool_config.get('admin_notifications', [])
+
 	def start(self, is_daemon = None, uid = None, gid = None):
 		"""
 		Start the server. Optionally takes a flag for starting as a daemon
 		or not as well as what user/group to run as if it is a daemon.
 		"""
 
-		jvm        = self.tool_config.get('java',             default = 'java')
-		max_heap   = self.tool_config.get('heap',             default = '1G')
-		max_stack  = self.tool_config.get('stack',            default = '1G')
-		perm_gen   = self.tool_config.get('perm_gen',         default = '32m')
-		jar        = self.tool_config.get('jar',              default = 'minecraft_server.jar')
-		extra_args = self.tool_config.get('extra_start_args', default = '')
-
 		if is_daemon == None:
 			is_daemon = self.tool_config.get('daemon', default = False)
 
 		if is_daemon:
 			self.launcher.start(
-				jvm,
-				max_heap,
-				max_stack,
-				perm_gen,
-				jar,
-				extra_args,
+				self,
 				uid,
 				gid,
 			)
@@ -67,8 +57,10 @@ class Server(object):
 			cwd = os.getcwd()
 			os.chdir(self.path)
 
-			command = base._build_command(jvm, max_heap, max_stack, perm_gen, jar, extra_args)
-			process =  subprocess.Popen(command, shell = True)
+			process = subprocess.Popen(self.start_command, shell = True)
+
+			for interface in self.admin_interfaces:
+				interface.server_start(self)
 
 			process.wait()
 
@@ -81,6 +73,9 @@ class Server(object):
 
 		self.launcher.stop()
 
+		for interface in self.admin_interfaces:
+			interface.server_stop(self)
+
 	def restart(self, is_daemon = None, uid = None, gid = None):
 		"""
 		Restart the server. Takes the same arguments as starting the server.
@@ -88,6 +83,95 @@ class Server(object):
 
 		self.stop()
 		self.start(is_daemon, uid, gid)
+
+		for interface in self.admin_interfaces:
+			interface.server_restart(self)
+
+	@property
+	def jvm(self):
+		"""
+		Get the Java executable to launch with.
+		"""
+
+		return self.tool_config.get('java', default = 'java')
+
+	@property
+	def heap_size(self):
+		"""
+		Get the max heap size for the JVM to run with.
+		"""
+
+		return self.tool_config.get('heap', default = '1G')
+
+	@property
+	def stack_size(self):
+		"""
+		Get the max stack size for the JVM to run with.
+		"""
+
+		return self.tool_config.get('stack', default = '1G')
+
+	@property
+	def perm_gen(self):
+		"""
+		Get the PermGen size for the JVM to run with.
+		"""
+
+		return self.tool_config.get('perm_gen', default = '32m')
+
+	@property
+	def jar(self):
+		"""
+		Get the jar file to use when starting the server.
+		"""
+
+		return self.tool_config.get('jar', default = 'minecraft_server.jar')
+
+	@property
+	def extra_start_args(self):
+		"""
+		Get the extra arguments to pass to the server when starting.
+		"""
+
+		return self.tool_config.get('extra_start_args', default = '')
+
+	@property
+	def start_command(self):
+		"""
+		Get a basic command that could be used to start the server.
+		"""
+
+		return '{jvm} -Xmx{heap} -Xms{stack} -XX:MaxPermSize={perm_gen} -jar {jar} {args}'.format(
+			jvm      = self.jvm,
+			heap     = self.heap_size,
+			stack    = self.stack_size,
+			perm_gen = self.perm_gen,
+			jar      = self.jar,
+			args     = self.extra_start_args,
+		)
+
+	@property
+	def admin_interfaces(self):
+		"""
+		Get collection of admin interface objects
+		"""
+
+		return [
+			self._construct_admin_interface(interface)
+			for interface in self.admin_interface_configs
+		]
+
+	def _construct_admin_interface(self, interface_config):
+		"""
+		Build an interface from the configuration
+		"""
+
+		if 'class' not in interface_config:
+			raise base.MCServerError('Improperly configure admin interface')
+
+		interface_class = reflection.get_class(interface_config['class'])
+
+		return interface_class(**interface_config)
 
 	def _validate_launcher_config(self):
 		"""
