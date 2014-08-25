@@ -114,7 +114,7 @@ class Server(object):
 		)
 
 		with tarfile.open(os.path.join(backup_dir, backup_name), 'w:gz') as tar:
-			tar.add(os.path.join(self.path, backup_dir, self.world_name))
+			tar.add(os.path.join(self.path, self.world_name))
 
 		if is_running:
 			self.rcon.send_command('saveon')
@@ -214,7 +214,10 @@ class Server(object):
 		be created if it does not exist.
 		"""
 
-		directory = self.tool_config.get('backup_dir', default = 'backups')
+		directory = os.path.join(
+			self.path,
+			self.tool_config.get('backup_dir', default = 'backups'),
+		)
 
 		if not os.path.exists(directory):
 			os.makedirs(directory)
