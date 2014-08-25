@@ -100,7 +100,7 @@ class Server(object):
 		# from saving to disk before we create an archive.
 		try:
 			self.rcon.send_command('say BACKUP STARTING - GOING READONLY')
-			self.rcon.send_command('saveoff')
+			self.rcon.send_command('save-off')
 
 			is_running = True
 		except socket.error: # We're assuming the problem was with no socket open
@@ -116,7 +116,7 @@ class Server(object):
 			tar.add(os.path.join(self.path, self.world_name))
 
 		if is_running:
-			self.rcon.send_command('saveon')
+			self.rcon.send_command('save-on')
 			self.rcon.send_command('say BACKUP COMPLETE')
 
 	@property
