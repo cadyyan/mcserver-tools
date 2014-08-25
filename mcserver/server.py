@@ -106,7 +106,6 @@ class Server(object):
 		except socket.error: # We're assuming the problem was with no socket open
 			is_running = False
 
-		# TODO: maybe want to look into max number of backups to keep around or max age
 		backup_dir  = self.backup_dir
 		backup_name = '{}-{}.tar.gz'.format(
 			datetime.datetime.now().isoformat(),

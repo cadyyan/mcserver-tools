@@ -37,6 +37,23 @@ If you're going to be developing your own launcher you should extend the `mcserv
 #### Notes
 You can configure a certain mode to always happen by default. If you always want to run the server as a `daemon` you can set the daemon attribute in the settings file to true and by default the server will be launched in daemon mode. You can force it to do the opposite of the setting value by giving the `--daemon` or `--no-daemon` options on the commandline.
 
+### Stop
+Put simply, stops the server. Simple usage:
+
+	mcserver stop --dir <dir>
+
+If you didn't see the pattern yet, `--dir <dir>` is optional.
+
+### Restart
+A combination of stop and start commands. Usage is the same including the optional `--daemon` and `--no-daemon` options.
+
+### Backup
+Creates a tarball of the world file. The world directory is selected based off of the `level-name` property of the server configuration file. All backups have a timestamp in the file name. Backups are stored in a directory that can be specified in your `mcserver.settings` file using the `backup_dir` attribute. By default this value is set to `backups`. If the directory does not exist the directory is created. Backups can be safely done on a server that is currently running. If the server is running the `save-off` command is sent to the server to prevent further writing to disk. After the tarball is created the `save-on` command is sent to continue saving to disk. Usage looks like this:
+
+	mcserver backup --dir <dir>
+
+I'm not going to mention the optional thing again...
+
 ## Admin Interfaces
 Admin interfaces are a way to notify server admins about changes in the server. For instance if the server is started you may want to email the server admins that the server was started. Same would apply with stopping or restarting. Configuration of an interface is very similar to configuration of a launcher. A sample config could look like this:
 
