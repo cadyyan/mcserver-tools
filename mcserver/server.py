@@ -114,7 +114,7 @@ class Server(object):
 		)
 
 		with tarfile.open(os.path.join(backup_dir, backup_name), 'w:gz') as tar:
-			tar.add(os.path.join(backup_dir, self.world_name))
+			tar.add(os.path.join(self.path, backup_dir, self.world_name))
 
 		if is_running:
 			self.rcon.send_command('saveon')
