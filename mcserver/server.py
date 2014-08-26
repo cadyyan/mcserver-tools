@@ -9,7 +9,7 @@ import socket
 import subprocess
 import tarfile
 
-from mcserver import base, config, reflection, rcon
+from mcserver import base, config, reflection, rcon, query
 
 class Server(object):
 	"""
@@ -41,7 +41,8 @@ class Server(object):
 
 		self.admin_interface_configs = self.tool_config.get('admin_notifications', [])
 
-		self._rcon = None
+		self._rcon  = None
+		self._query = None
 
 	def start(self, is_daemon = None, uid = None, gid = None):
 		"""
@@ -205,6 +206,18 @@ class Server(object):
 			self._rcon.connect(self.server_config)
 
 		return self._rcon
+
+	@property
+	def query(self):
+		"""
+		Get a Query instance. This may fail if Query is not setup on the server
+		OR the server isn't running.
+		"""
+
+		if not self._query:
+			self._query = query.QueryClient(self.server_config)
+
+		return self._query
 
 	@property
 	def backup_dir(self):

@@ -13,6 +13,7 @@ class RConClient(object):
 	"""
 
 	COMMAND_TYPE = 2
+	DEFAULT_PORT = 25575
 	ERROR_REGEX  = re.compile(r'^Error executing: [^\(]* \((?P<response>.*)\)$')
 	LOGIN_ERROR  = -1
 	LOGIN_TYPE   = 3
@@ -27,8 +28,8 @@ class RConClient(object):
 			raise Exception('RCon not enabled on server')
 
 		self.host   = '127.0.0.1'
-		self.port   = server_settings.get_int('rcon.port', 25575)
-		self.socket = self._create_socket()
+		self.port   = server_settings.get_int('rcon.port', RConClient.DEFAULT_PORT)
+		self.socket = RConClient._create_socket()
 
 	def connect(self, server_settings):
 		"""
@@ -49,7 +50,7 @@ class RConClient(object):
 
 		self.socket.close()
 
-		self.socket = self._create_socket()
+		self.socket = RConClient._create_socket()
 
 	def _send_raw(self, data_type, data):
 		"""
@@ -105,7 +106,8 @@ class RConClient(object):
 		self.socket.settimeout(30)
 		self.socket.recv(12)
 
-	def _create_socket(self):
+	@staticmethod
+	def _create_socket():
 		"""
 		Create a new socket
 		"""
