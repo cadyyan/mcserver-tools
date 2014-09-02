@@ -59,6 +59,18 @@ Admin interfaces are a way to notify server admins about changes in the server. 
 
 	admin_interfaces: [
 		{
+			"class": "mcserver.admin.nofitications.PushBulletNotification",
+			"auth_type": "basic",
+			"access_token": "my_secret_token"
+		},
+		{
+			"class": "mcserver.admin.nofitications.PushBulletNotification",
+			"auth_type": "oauth",
+			"client_id": "my_client_id",
+			"client_secret": "my_client_secrent",
+			"access_token": "my_access_token",
+		},
+		{
 			"class": "some.class",
 			"key1": "value1",
 			"key2": "value2",
@@ -69,6 +81,14 @@ Admin interfaces are a way to notify server admins about changes in the server. 
 	]
 
 You can have as many interfaces as you want and you can have a single class showing up more than once. All configurations are passed to the interface when it is constructed. When developing an interface make sure to not block.
+
+### PushBullet
+PushBullet support for notifications is supported via the `mcserver.admin.notifications.PushBulletNotification` class. Configuration is pretty simple. Set the class to the afformentioned class and you can either provide and access token to act as a user or you can provide OAuth settings via the client_id, client_secret, and access_token to act on behalf of a user but with OAuth protection and logging. OAuth is the recommended way to go.
+
+To select the authentication type you set the auth_type attribute to either basic or oauth.
+
+#### Notes
+When using OAuth the user you're acting on behalf of must grant you access to act as them. This is explained in the PushBullet documentation. You'll also need to be sure to register your app as a PushBullet client with them to get your client ID and secret.
 
 ## Settings File
 You can store settings for running the server in the `mcserver.settings` file. One use for this file is storing the options that are used to start the server. The file is formatted as a JSON file. A sample can be found below:
