@@ -53,6 +53,9 @@ class Server(object):
 		if is_daemon == None:
 			is_daemon = self.tool_config.get('daemon', default = False)
 
+		for interface in self.admin_interfaces:
+			interface.server_start(self)
+
 		if is_daemon:
 			self.launcher.start(
 				uid,
@@ -63,9 +66,6 @@ class Server(object):
 			os.chdir(self.path)
 
 			process = subprocess.Popen(self.start_command, shell = True)
-
-			for interface in self.admin_interfaces:
-				interface.server_start(self)
 
 			process.wait()
 

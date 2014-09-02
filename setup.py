@@ -10,6 +10,7 @@ setup(
 	scripts          = ['bin/mcserver'],
 	install_requires = [
 		'daemon',
+		'PyBullet',
 		'tmuxp',
 	],
 )

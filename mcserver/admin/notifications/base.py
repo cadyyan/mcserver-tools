@@ -7,7 +7,6 @@ class AdminNotificationInterface(object):
 
 	__metaclass__ = abc.ABCMeta
 
-	@abc.abstractmethod
 	def __init__(self, **kwargs):
 		"""
 		Create interface object with config
