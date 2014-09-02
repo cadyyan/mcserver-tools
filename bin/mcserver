@@ -50,7 +50,7 @@ def handler_restart_server(args):
 		is_daemon = args.is_daemon
 
 	server = mcserver.Server(args.server_dir)
-	server.start(
+	server.restart(
 		is_daemon = is_daemon,
 		uid       = args.uid,
 		gid       = args.gid,
