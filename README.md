@@ -105,7 +105,27 @@ You can store settings for running the server in the `mcserver.settings` file. O
 			"session_name": "minecraft",
 			"window_name": "My Minecraft Server"
 		},
-		"admin_interfaces": [
+		admin_interfaces: [
+			{
+				"class": "mcserver.admin.nofitications.PushBulletNotification",
+				"auth_type": "basic",
+				"access_token": "my_secret_token"
+			},
+			{
+				"class": "mcserver.admin.nofitications.PushBulletNotification",
+				"auth_type": "oauth",
+				"client_id": "my_client_id",
+				"client_secret": "my_client_secrent",
+				"access_token": "my_access_token",
+			},
+			{
+				"class": "some.class",
+				"key1": "value1",
+				"key2": "value2",
+			},
+			{
+				"class": "some.other.class",
+			}
 		]
 	}
 
