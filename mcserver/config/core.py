@@ -5,6 +5,8 @@ MCServer Tools config loader
 import json
 import os.path
 
+from mcserver import MCServerError
+
 class CoreConfig(object):
 	"""
 	MCServer Tools configuration
@@ -27,8 +29,11 @@ class CoreConfig(object):
 		Load the settings from disk
 		"""
 
-		with open(self.settings_file, 'r') as fh:
-			self._settings = json.load(fh)
+		try:
+			with open(self.settings_file, 'r') as fh:
+				self._settings = json.load(fh)
+		except:
+			raise MCServerError('Could not open settings file: {}'.format(self.settings_file))
 
 	def get(self, property, default = None):
 		"""
